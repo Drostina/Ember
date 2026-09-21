@@ -171,7 +171,7 @@ jobs:
         env:
           DIGEST: ${{ steps.push-image.outputs.digest }}
         run: |
-          cosign verify --key cosign.pub --new-bundle-format=false --registry-referrers-mode=legacy "${IMAGE_REGISTRY}/${IMAGE_NAME}@${DIGEST}"
+          cosign verify --key cosign.pub --new-bundle-format=false "${IMAGE_REGISTRY}/${IMAGE_NAME}@${DIGEST}"
 
       - name: Clean up old Ember images
         uses: snok/container-retention-policy@d3bdcf5ce9b05f685154e4a16c39233b245e3d53 # v3.1.0
