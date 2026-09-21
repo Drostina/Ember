@@ -164,10 +164,8 @@ jobs:
           account: user
           token: ${{ secrets.GITHUB_TOKEN }}
           image-names: ember
-          # Preserve the current image and Cosign signing metadata.
           image-tags: "!latest !sha256-*"
-          cut-off: 30d
-          # Keep five additional tagged versions beyond the 30-day window.
-          keep-n-most-recent: 5
+          cut-off: 0d
+          keep-n-most-recent: 2
           tag-selection: both
-          timestamp-to-use: updated_at
+          timestamp-to-use: created_at

@@ -1,5 +1,5 @@
 ---
-name: Build disk images
+name: Build ISO
 
 on:
   workflow_dispatch:
@@ -20,21 +20,18 @@ env:
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
-  cancel-in-progress: true
+  group: ember-iso
+  cancel-in-progress: false
 
 jobs:
   build:
-    name: Build disk images
+    name: Build ISO
     runs-on: ${{ inputs.platform == 'amd64' && 'ubuntu-26.04' || 'ubuntu-26.04-arm' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        disk-type: ["qcow2", "anaconda-iso"]
     permissions:
       contents: read
       packages: read
       id-token: write
+      actions: write
 
     steps:
       - name: Checkout
@@ -45,14 +42,11 @@ jobs:
           source ./ember.env
           USER_UID=$(id -u)
           USER_GID=$(id -g)
-          # Concatenate the types with a hyphen
-          DISK_TYPE=$(echo "${{ matrix.disk-type }}" | tr ' ' '-')
           # Lowercase the image uri
           echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
           echo "IMAGE_NAME=${IMAGE_NAME,,}" >> ${GITHUB_ENV}
           echo "DEFAULT_TAG=${DEFAULT_TAG}" >> ${GITHUB_ENV}
           echo "BIB_IMAGE=${BIB_IMAGE}" >> ${GITHUB_ENV}
-          echo "DISK_TYPE=${DISK_TYPE}" >> ${GITHUB_ENV}
           echo "USER_UID=${USER_UID}" >> ${GITHUB_ENV}
           echo "USER_GID=${USER_GID}" >> ${GITHUB_ENV}
 
@@ -70,26 +64,57 @@ jobs:
         with:
           remove-codeql: true
 
-      - name: Build disk images
+      - name: Build ISO
         id: build
         uses: osbuild/bootc-image-builder-action@cb4b3e9c112077ea96a191fad229d51d2a012885 # main
         with:
           builder-image: ${{ env.BIB_IMAGE }}
-          config-file: ${{ matrix.disk-type == 'anaconda-iso' && './disk_config/iso.toml' || './disk_config/disk.toml' }}
+          config-file: ./disk_config/iso.toml
           image: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}
           chown: ${{ env.USER_UID }}:${{ env.USER_GID }}
-          types: ${{ matrix.disk-type }}
+          types: anaconda-iso
           additional-args: --use-librepo=True
 
-      - name: Upload disk images and Checksum to Job Artifacts
+      - name: Upload ISO and checksum
+        id: upload-iso
         if: inputs.upload-to-s3 != true && github.event_name != 'pull_request'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
+          name: ember-iso-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ steps.build.outputs.output-directory }}
           if-no-files-found: error
-          retention-days: 0
+          retention-days: 3
           compression-level: 0
-          overwrite: true
+
+      - name: Remove previous ISO downloads
+        if: steps.upload-iso.outcome == 'success'
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        env:
+          CURRENT_ARTIFACT_ID: ${{ steps.upload-iso.outputs.artifact-id }}
+        with:
+          script: |
+            const currentId = Number(process.env.CURRENT_ARTIFACT_ID);
+            if (!Number.isSafeInteger(currentId) || currentId <= 0) {
+              throw new Error('Missing uploaded ISO artifact ID; skipping cleanup.');
+            }
+            const { data: current } = await github.rest.actions.getArtifact({
+              ...context.repo, artifact_id: currentId
+            });
+            if (current.expired || !/^ember-iso-\d+-\d+$/.test(current.name)) {
+              throw new Error('Replacement ISO is unavailable; skipping cleanup.');
+            }
+            const artifacts = await github.paginate(github.rest.actions.listArtifactsForRepo, {
+              ...context.repo, per_page: 100
+            });
+            for (const artifact of artifacts) {
+              if (/^ember-iso-\d+-\d+$/.test(artifact.name) &&
+                  artifact.id < currentId && artifact.created_at <= current.created_at) {
+                await github.rest.actions.deleteArtifact({
+                  ...context.repo, artifact_id: artifact.id
+                });
+                core.info(`Deleted previous ISO artifact ${artifact.name}`);
+              }
+            }
       
       - name: Upload to S3
         if: inputs.upload-to-s3 == true && github.event_name != 'pull_request'
