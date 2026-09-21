@@ -3,6 +3,7 @@ COPY build_files /
 COPY cosign.pub /cosign.pub
 COPY system_files /system_files
 COPY assets/branding/ember-symbol.svg /system_files/usr/share/icons/hicolor/scalable/apps/ember-logo-icon.svg
+COPY system_files/usr/share/plymouth/themes/spinner/watermark.png /system_files/usr/share/pixmaps/fedora-gdm-logo.png
 
 FROM ghcr.io/ublue-os/bazzite-gnome-nvidia-open:stable
 
