@@ -1,0 +1,4 @@
+[org.gnome.desktop.background]
+picture-uri='file:///usr/share/backgrounds/ember/ember.svg'
+picture-uri-dark='file:///usr/share/backgrounds/ember/ember.svg'
+picture-options='zoom'

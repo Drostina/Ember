@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160">
+  <title>Ember — Afterglow</title>
+  <desc>Warm amber, coral and rose ribbons flowing across a charcoal background.</desc>
+  <defs>
+    <linearGradient id="night" x2="1" y2="1">
+      <stop stop-color="#090c12"/>
+      <stop offset="1" stop-color="#171018"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".77" cy=".77" r=".7">
+      <stop stop-color="#703025" stop-opacity=".45"/>
+      <stop offset=".65" stop-color="#391922" stop-opacity=".15"/>
+      <stop offset="1" stop-color="#090c12" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="outer" x1=".15" y1="0" x2=".9" y2="1">
+      <stop stop-color="#ffde9b"/>
+      <stop offset=".3" stop-color="#ffae69"/>
+      <stop offset=".64" stop-color="#e96761"/>
+      <stop offset="1" stop-color="#722942"/>
+    </linearGradient>
+    <linearGradient id="inner" x1=".2" y1="0" x2=".85" y2="1">
+      <stop stop-color="#ffc47f"/>
+      <stop offset=".4" stop-color="#f58a66"/>
+      <stop offset=".76" stop-color="#bd4663"/>
+      <stop offset="1" stop-color="#421e34"/>
+    </linearGradient>
+    <linearGradient id="shadow" x2=".8" y2="1">
+      <stop stop-color="#341e26"/>
+      <stop offset="1" stop-color="#100f17"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fff0c8" stop-opacity=".8"/>
+      <stop offset=".6" stop-color="#ffb586" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#ed7395" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#night)" d="M0 0h3840v2160H0z"/>
+  <path fill="url(#glow)" d="M0 0h3840v2160H0z"/>
+  <path fill="url(#outer)" d="M4050 210C3300 330 3200 945 2580 1230C2120 1442 1850 1430 1570 1690C1370 1875 1320 2060 1330 2300H4050Z"/>
+  <path fill="url(#shadow)" d="M4050 350C3370 460 3290 1040 2670 1350C2240 1565 2000 1530 1730 1790C1570 1945 1510 2110 1535 2300H4050Z"/>
+  <path fill="url(#inner)" d="M4050 810C3580 840 3420 1305 3020 1510C2710 1668 2470 1630 2240 1830C2080 1970 2020 2140 2040 2300H4050Z"/>
+  <path fill="url(#shadow)" d="M4050 965C3660 1010 3550 1400 3140 1620C2870 1765 2630 1740 2425 1920C2310 2020 2250 2160 2260 2300H4050Z"/>
+  <path fill="none" stroke="url(#edge)" stroke-width="3" d="M4050 210C3300 330 3200 945 2580 1230C2120 1442 1850 1430 1570 1690C1370 1875 1320 2060 1330 2300"/>
+  <path fill="none" stroke="url(#edge)" stroke-width="2" opacity=".6" d="M4050 810C3580 840 3420 1305 3020 1510C2710 1668 2470 1630 2240 1830C2080 1970 2020 2140 2040 2300"/>
+</svg>
