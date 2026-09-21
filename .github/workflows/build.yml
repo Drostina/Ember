@@ -61,6 +61,34 @@ jobs:
           echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
           echo "IMAGE_NAME=${IMAGE_NAME,,}" >> ${GITHUB_ENV}
 
+      - name: Require Bazzite signature
+        run: |
+          set -euo pipefail
+          config_dir="$HOME/.config/containers"
+          mkdir -p "$config_dir"
+          if [ ! -d "$config_dir/registries.d" ]; then
+            mkdir -p "$config_dir/registries.d"
+            if [ -d /etc/containers/registries.d ]; then
+              cp -a /etc/containers/registries.d/. "$config_dir/registries.d/"
+            fi
+          fi
+          install -m644 .github/containers/ublue-os.pub "$config_dir/ublue-os.pub"
+          install -m644 .github/containers/bazzite.yaml "$config_dir/registries.d/ember-base.yaml"
+          policy_source="$config_dir/policy.json"
+          if [ ! -f "$policy_source" ]; then
+            policy_source=/etc/containers/policy.json
+          fi
+          policy_tmp=$(mktemp)
+          jq -e --arg key "$config_dir/ublue-os.pub" '
+            .transports.docker["ghcr.io/ublue-os/bazzite-gnome-nvidia-open"] = [{
+              "type": "sigstoreSigned",
+              "keyPath": $key,
+              "signedIdentity": {"type": "matchRepository"}
+            }]
+          ' "$policy_source" > "$policy_tmp"
+          install -m644 "$policy_tmp" "$config_dir/policy.json"
+          rm "$policy_tmp"
+
       # This actually builds the container image
       - name: Build Image
         id: build-image
@@ -155,7 +183,14 @@ jobs:
           # https://github.com/containers/container-libs/issues/388
           # https://github.com/coreos/rpm-ostree/issues/5509
           # use old bundle format, so we can use newer cosign 3.X.X instead of 2.X.X
-          cosign sign -y --new-bundle-format=false --use-signing-config=false --key env://COSIGN_PRIVATE_KEY ${IMAGE_REGISTRY}/${IMAGE_NAME}@${DIGEST}
+          cosign sign -y --new-bundle-format=false --use-signing-config=false --registry-referrers-mode=legacy --key env://COSIGN_PRIVATE_KEY ${IMAGE_REGISTRY}/${IMAGE_NAME}@${DIGEST}
+
+      - name: Verify image signature
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        env:
+          DIGEST: ${{ steps.push-image.outputs.digest }}
+        run: |
+          cosign verify --key cosign.pub --new-bundle-format=false --registry-referrers-mode=legacy "${IMAGE_REGISTRY}/${IMAGE_NAME}@${DIGEST}"
 
       - name: Clean up old Ember images
         uses: snok/container-retention-policy@d3bdcf5ce9b05f685154e4a16c39233b245e3d53 # v3.1.0

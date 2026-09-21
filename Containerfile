@@ -1,6 +1,7 @@
 # Allow build scripts to be referenced without being copied into the final image
 FROM scratch AS ctx
 COPY build_files /
+COPY cosign.pub /cosign.pub
 COPY system_files /system_files
 
 # Base Image

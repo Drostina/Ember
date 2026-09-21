@@ -5,6 +5,12 @@ set -ouex pipefail
 # Copy the contents of system_files/ of the git repo to /
 cp -avf "/ctx/system_files"/. /
 
+install -Dm644 /ctx/cosign.pub /etc/pki/containers/ember.pub
+policy_tmp=$(mktemp)
+jq -e -f /ctx/ember-policy.jq /etc/containers/policy.json > "$policy_tmp"
+install -m644 "$policy_tmp" /etc/containers/policy.json
+rm "$policy_tmp"
+
 ### Install packages
 
 # Packages can be installed from any enabled yum repo on the image.

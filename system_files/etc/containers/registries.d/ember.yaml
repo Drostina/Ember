@@ -1,0 +1,3 @@
+docker:
+  ghcr.io/drostina/ember:
+    use-sigstore-attachments: true
