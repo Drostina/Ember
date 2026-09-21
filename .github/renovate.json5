@@ -8,6 +8,11 @@
 
   "packageRules": [
     {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/ublue-os/bazzite-gnome-nvidia-open"],
+      "pinDigests": false,
+    },
+    {
       "automerge": true,
       "matchUpdateTypes": ["pin", "pinDigest"]
     },
