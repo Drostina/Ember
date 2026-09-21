@@ -17,11 +17,11 @@ PRs are disabled as this is just for my own use. You're welcome to use it yourse
 
 ### Install
 
-Install Bazzite GNOME with NVIDIA Open first. Once Ember's signed image is published, run this from your installed system:
+Install Bazzite GNOME with NVIDIA Open first:
 
 ```bash
 curl -fsSLo rebase.sh https://raw.githubusercontent.com/Drostina/Ember/main/rebase.sh
 bash rebase.sh
 ```
 
-Reboot when it finishes. Bazzite handles installation; Ember adds my Niri packages. Extra Flatpaks are handled by my Niri install script.
+Reboot when it finishes. Bazzite handles installation; Ember adds my Niri packages.
