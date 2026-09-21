@@ -35,6 +35,12 @@ dnf5 install -y \
     breeze-cursor-theme \
     jetbrains-mono-fonts-all \
     fontawesome-fonts-all \
+    socat \
+    git \
+    perl-Error \
+    perl-Git \
+    perl-TermReadKey \
+    python3-libdnf5 \
     clang \
     cmake \
     ninja-build \
