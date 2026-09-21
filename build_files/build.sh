@@ -18,8 +18,29 @@ rm "$policy_tmp"
 # List of rpmfusion packages can be found here:
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
 
-# this installs a package from fedora repos
-dnf5 install -y tmux
+dnf5 install -y \
+    --setopt=install_weak_deps=True \
+    --setopt=exclude_from_weak=alacritty,waybar \
+    niri \
+    quickshell \
+    xfce-polkit \
+    kitty \
+    fastfetch \
+    pavucontrol \
+    gnome-disk-utility \
+    breeze-cursor-theme \
+    jetbrains-mono-fonts-all \
+    fontawesome-fonts-all \
+    clang \
+    cmake \
+    ninja-build \
+    nodejs \
+    rust \
+    cargo \
+    swayidle \
+    playerctl \
+    brightnessctl \
+    cava
 
 # Use a COPR Example:
 #
@@ -31,3 +52,4 @@ dnf5 install -y tmux
 #### Example for enabling a System Unit File
 
 systemctl enable podman.socket
+systemctl enable ember-flatpak-setup.service

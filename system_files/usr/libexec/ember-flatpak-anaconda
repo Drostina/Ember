@@ -1,0 +1,37 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+target=/mnt/sysroot
+test -f "$target/usr/share/ember/flatpaks"
+test -f "$target/usr/libexec/ember-install-flatpaks"
+
+for directory in dev proc sys run; do
+    mount --rbind "/$directory" "$target/$directory"
+done
+
+backup=$(mktemp -d "$target/etc/ember-dns.XXXXXX")
+restore_dns() {
+    rm -f "$target/etc/resolv.conf"
+    if [[ -e "$backup/resolv.conf" || -L "$backup/resolv.conf" ]]; then
+        mv "$backup/resolv.conf" "$target/etc/resolv.conf"
+    fi
+    rmdir "$backup"
+}
+if [[ -e "$target/etc/resolv.conf" || -L "$target/etc/resolv.conf" ]]; then
+    mv "$target/etc/resolv.conf" "$backup/resolv.conf"
+fi
+trap restore_dns EXIT
+install -m644 /etc/resolv.conf "$target/etc/resolv.conf"
+
+for attempt in 1 2 3; do
+    echo "Installing Ember's Flatpak apps (attempt $attempt of 3)."
+    if timeout --kill-after=30s 45m chroot "$target" /usr/bin/bash /usr/libexec/ember-install-flatpaks; then
+        exit 0
+    fi
+    if (( attempt < 3 )); then
+        sleep 15
+    fi
+done
+
+echo "Flatpak downloads could not finish. First-boot recovery remains enabled." >&2
+exit 1
