@@ -32,6 +32,7 @@ dnf5 install -y \
     fastfetch \
     pavucontrol \
     gnome-disk-utility \
+    blender \
     breeze-cursor-theme \
     jetbrains-mono-fonts-all \
     fontawesome-fonts-all \
