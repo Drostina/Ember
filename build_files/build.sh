@@ -33,6 +33,7 @@ dnf5 install -y \
     pavucontrol \
     gnome-disk-utility \
     blender \
+    godot \
     breeze-cursor-theme \
     jetbrains-mono-fonts-all \
     fontawesome-fonts-all \
