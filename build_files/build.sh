@@ -44,8 +44,11 @@ dnf5 install -y \
     perl-TermReadKey \
     python3-libdnf5 \
     clang \
+    lld \
     cmake \
     ninja-build \
+    mingw64-gcc-c++ \
+    mingw64-winpthreads-static \
     nodejs \
     rust \
     cargo \
