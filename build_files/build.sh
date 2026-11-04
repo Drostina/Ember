@@ -49,6 +49,7 @@ dnf5 install -y \
     ninja-build \
     mingw64-gcc-c++ \
     mingw64-winpthreads-static \
+    dotnet-sdk-10.0 \
     nodejs \
     rust \
     cargo \
