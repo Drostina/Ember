@@ -57,6 +57,12 @@ dnf5 install -y \
     brightnessctl \
     cava
 
+mapfile -t rom_properties < <(rpm -qa --queryformat='%{NAME}\n' 'rom-properties*')
+if ((${#rom_properties[@]})); then
+    dnf5 remove -y --no-autoremove "${rom_properties[@]}"
+fi
+test -z "$(rpm -qa 'rom-properties*')"
+
 gtk-update-icon-cache -f /usr/share/icons/hicolor
 glib-compile-schemas /usr/share/glib-2.0/schemas
 
